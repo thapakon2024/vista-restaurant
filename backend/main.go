@@ -44,9 +44,14 @@ func main() {
 
 	// CORS middleware
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:3000", "https://*.netlify.app", "https://*.vercel.app"}
-	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
-	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept"}
+	config.AllowOrigins = []string{
+		"http://localhost:3000", 
+		"https://baantodo.netlify.app",
+		"https://*.vercel.app",
+	}
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	config.AllowCredentials = true
 	r.Use(cors.New(config))
 
 	// API routes
