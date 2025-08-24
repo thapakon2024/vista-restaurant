@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import Menu from "./pages/Menu";
 import Reservation from "./pages/Reservation";
 import Contact from "./pages/Contact";
-import AdminDashboard from "./pages/AdminDashboard";
+import ProtectedAdmin from "./pages/ProtectedAdmin";
 
 function App() {
 	return (
@@ -18,7 +18,7 @@ function App() {
 						<Route path="/menu" element={<Menu />} />
 						<Route path="/reservation" element={<Reservation />} />
 						<Route path="/contact" element={<Contact />} />
-						<Route path="/admin" element={<AdminDashboard />} />
+						<Route path="/secret-admin-dashboard-2024" element={<ProtectedAdmin />} />
 					</Routes>
 				</main>
 				<Footer />

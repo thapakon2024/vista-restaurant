@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
 	return (
@@ -97,6 +98,14 @@ const Footer = () => {
 
 				<div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-300">
 					<p>&copy; 2025 Bella Vista Restaurant. All rights reserved.</p>
+					{/* Hidden admin access - only visible on hover and you need to know the path */}
+					<Link 
+						to="/secret-admin-dashboard-2024" 
+						className="text-gray-900 hover:text-gray-700 transition-colors duration-200 opacity-0 hover:opacity-30 text-xs absolute bottom-2 right-4"
+						title="Admin Access"
+					>
+						⚙️
+					</Link>
 				</div>
 			</div>
 		</footer>
