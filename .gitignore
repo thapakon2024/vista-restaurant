@@ -114,8 +114,5 @@ jspm_packages/
 # Test binary, built with `go test -c`
 *.test
 
-# Output of the go coverage tool
-go.sum
-
 # Go workspace file
 go.work
