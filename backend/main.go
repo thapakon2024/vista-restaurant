@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -57,7 +58,13 @@ func main() {
 	// API routes
 	api := r.Group("/api")
 	{
+		// Menu endpoints
 		api.GET("/menu", getMenuItems)
+		api.POST("/menu", createMenuItem)
+		api.PUT("/menu/:id", updateMenuItem)
+		api.DELETE("/menu/:id", deleteMenuItem)
+		
+		// Reservation endpoints
 		api.POST("/reservation", createReservation)
 		api.GET("/reservations", getReservations)
 	}
@@ -176,6 +183,110 @@ func getMenuItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, menuItems)
+}
+
+// Create a new menu item
+func createMenuItem(c *gin.Context) {
+	var item MenuItem
+	if err := c.ShouldBindJSON(&item); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	// Validate required fields
+	if item.Name == "" || item.Price <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name and price are required"})
+		return
+	}
+
+	result, err := db.Exec(`
+		INSERT INTO menu_items (name, description, price, category, image) 
+		VALUES (?, ?, ?, ?, ?)`,
+		item.Name, item.Description, item.Price, item.Category, item.Image)
+	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create menu item"})
+		return
+	}
+
+	// Get the inserted ID
+	id, err := result.LastInsertId()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get inserted ID"})
+		return
+	}
+
+	item.ID = int(id)
+	c.JSON(http.StatusCreated, item)
+}
+
+// Update an existing menu item
+func updateMenuItem(c *gin.Context) {
+	id := c.Param("id")
+	var item MenuItem
+	
+	if err := c.ShouldBindJSON(&item); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
+		return
+	}
+
+	// Validate required fields
+	if item.Name == "" || item.Price <= 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Name and price are required"})
+		return
+	}
+
+	result, err := db.Exec(`
+		UPDATE menu_items 
+		SET name = ?, description = ?, price = ?, category = ?, image = ? 
+		WHERE id = ?`,
+		item.Name, item.Description, item.Price, item.Category, item.Image, id)
+	
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update menu item"})
+		return
+	}
+
+	// Check if any rows were affected
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check update result"})
+		return
+	}
+
+	if rowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Menu item not found"})
+		return
+	}
+
+	// Return the updated item with the ID
+	item.ID, _ = strconv.Atoi(id)
+	c.JSON(http.StatusOK, item)
+}
+
+// Delete a menu item
+func deleteMenuItem(c *gin.Context) {
+	id := c.Param("id")
+
+	result, err := db.Exec("DELETE FROM menu_items WHERE id = ?", id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete menu item"})
+		return
+	}
+
+	// Check if any rows were affected
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check delete result"})
+		return
+	}
+
+	if rowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Menu item not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Menu item deleted successfully"})
 }
 
 func createReservation(c *gin.Context) {
