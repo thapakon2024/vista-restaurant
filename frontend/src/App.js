@@ -18,7 +18,10 @@ function App() {
 						<Route path="/menu" element={<Menu />} />
 						<Route path="/reservation" element={<Reservation />} />
 						<Route path="/contact" element={<Contact />} />
-						<Route path="/secret-admin-dashboard-2024" element={<ProtectedAdmin />} />
+						<Route
+							path="/secret-admin-dashboard-2024"
+							element={<ProtectedAdmin />}
+						/>
 					</Routes>
 				</main>
 				<Footer />
