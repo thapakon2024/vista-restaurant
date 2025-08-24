@@ -116,3 +116,6 @@ jspm_packages/
 
 # Go workspace file
 go.work
+
+# Local Netlify folder
+.netlify
